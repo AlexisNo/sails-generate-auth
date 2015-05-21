@@ -1,3 +1,15 @@
+<script type="text/javascript">
+login = function() {
+    var data = {
+        identifier: document.getElementById("identifier").value,
+        password: document.getElementById("password").value
+    };
+    io.socket.post('/auth/local', data, function (resData, jwres){
+        document.getElementById("res-data").innerHTML += "\n" + JSON.stringify(resData);
+    });
+};
+</script>
+
 <% if (errors) {%>
   <% errors.forEach(function (error) { %>
     <%= __(error) %>
@@ -5,9 +17,10 @@
 <% } %>
 
 <form role="form" action="/auth/local" method="post">
-  <input type="text" name="identifier" placeholder="Username or Email">
-  <input type="password" name="password" placeholder="Password">
+  <input type="text" name="identifier" id="identifier" placeholder="Username or Email">
+  <input type="password" name="password" id="password" placeholder="Password">
   <button type="submit">Sign in</button>
+  <button type="button" onclick="javascript: login()">Sign up by websocket</button>
 </form>
 
 <% if (Object.keys(providers).length) {%>
@@ -17,3 +30,6 @@
     <a href="/auth/<%= providers[key].slug %>" role="button"><%= providers[key].name %></a>
   <% }) %>
 <% } %>
+
+<h4>Authentication information retrieved by websocket:</h4>
+<pre id="res-data">...</pre>

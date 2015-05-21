@@ -1,3 +1,17 @@
+<script type="text/javascript">
+register = function() {
+    var data = {
+        username: document.getElementById("username").value,
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value
+    };
+    io.socket.post('/auth/local/register', data, function (resData, jwres){
+        console.log(resData);
+        document.getElementById("res-data").innerHTML +=  "\n" + JSON.stringify(resData);
+    });
+};
+</script>
+
 <% if (errors) {%>
   <% errors.forEach(function (error) { %>
     <%= __(error) %>
@@ -5,8 +19,12 @@
 <% } %>
 
 <form role="form" action="/auth/local/register" method="post">
-  <input type="text" name="username" placeholder="Username">
-  <input type="text" name="email" placeholder="Email">
-  <input type="password" name="password" placeholder="Password">
+  <input type="text" name="username" id="username" placeholder="Username">
+  <input type="text" name="email" id="email" placeholder="Email">
+  <input type="password" name="password" id="password" placeholder="Password">
   <button type="submit">Sign up</button>
+  <button type="button" onclick="javascript: register()">Sign up by websocket</button>
 </form>
+
+<h4>Authentication information retrieved by websocket:</h4>
+<pre id="res-data">...</pre>

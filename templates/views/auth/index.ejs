@@ -1,0 +1,28 @@
+<script>
+window.onload = function() {
+  io.socket.get('/whoami', function (resData, jwres){
+    document.getElementById("res-data").innerHTML = JSON.stringify(resData);
+  });
+};
+logout = function() {
+    io.socket.get('/logout', function (resData, jwres){
+        document.getElementById("res-data").innerHTML += "\n" + JSON.stringify(resData);
+    });
+};
+</script>
+<a href="/login">login</a>
+<a href="/register">register</a>
+<a href="/logout">logout</a>
+<button onclick="logout()">websocket logout</button>
+<h4>Authentication information retrieved by http:</h4>
+<p>
+  <% if (user) { %>
+    Username: <%= user.username %><br />
+    Email: <%= user.email %>
+  <% } else { %>
+    Anonymous
+  <% } %>
+</p>
+
+<h4>Authentication information retrieved by websocket:</h4>
+<pre id="res-data">...</pre>

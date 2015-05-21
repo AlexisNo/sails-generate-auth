@@ -36,7 +36,7 @@ var AuthController = {
 
     // Get a list of available providers for use in your templates.
     Object.keys(strategies).forEach(function (key) {
-      if (key === 'local') {
+      if (!strategies[key].name) {
         return;
       }
 
@@ -72,8 +72,12 @@ var AuthController = {
     
     // mark the user as logged out for auth purposes
     req.session.authenticated = false;
-    
-    res.redirect('/');
+
+    if (req.wantsJSON) {
+      res.json({logout: true});
+    } else {
+      res.redirect('/');
+    }
   },
 
   /**
@@ -132,10 +136,12 @@ var AuthController = {
       var flashError = req.flash('error')[0];
 
       if (err && !flashError ) {
-        req.flash('error', 'Error.Passport.Generic');
-      } else if (flashError) {
-        req.flash('error', flashError);
+        flashError = 'Error.Passport.Generic'
       }
+      if (req.wantsJSON) {
+        return res.json({err: flashError});
+      }
+      req.flash('error', flashError);
       req.flash('form', req.body);
 
       // If an error was thrown, redirect the user to the
@@ -170,7 +176,11 @@ var AuthController = {
         
         // Upon successful login, send the user to the homepage were req.user
         // will be available.
-        res.redirect('/');
+        if (req.wantsJSON) {
+            res.json({user: req.user})
+        } else {
+            res.redirect('/');
+        }
       });
     });
   },
@@ -183,6 +193,31 @@ var AuthController = {
    */
   disconnect: function (req, res) {
     passport.disconnect(req, res);
+  },
+
+  /**
+   * Render the authentication index page
+   *
+   * @param {Object} req
+   * @param {Object} res
+   */
+  index: function (req, res) {
+    // Render the `auth/login.ext` view
+    res.view({
+      user : req.user
+    });
+  },
+
+  /**
+   * Return authentication information in a json object
+   *
+   * @param {Object} req
+   * @param {Object} res
+   */
+  whoami: function (req, res) {
+    return res.json({
+      user: req.user
+    });
   }
 };
 
